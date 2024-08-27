@@ -3,6 +3,7 @@ dotenv.config()
 const myToken = process.env.DISCORD_TOKEN;
 const sql_user = process.env.MYSQL_USER;
 const sql_pass = process.env.MYSQL_PASS;
+const sql_ip = process.env.MYSQL_IP;
 import mysql from 'mysql2'
 import { matchVC } from './commands/matchvc.js';
 import { leaderboard } from './commands/leaderboards.js';
@@ -13,23 +14,16 @@ import { Client, GatewayIntentBits, PermissionFlagsBits, ChannelType, userMentio
 import { endMatch } from './commands/endmatch.js';
 
 //MySQL Setup
-const con = await mysql.createConnection({
-    host: "127.0.0.1",
+const con = await mysql.createPool({
+    host: sql_ip,
     user: sql_user,
     password: sql_pass,
-    database: "discord"
+    database: "discord",
+    waitForConnections: true,
+    connectionLimit: 4,
+    queueLimit: 0
 });
-con.connect(function(err) {
-    if (err) throw err;
-    console.log("Successfully Connected to MySQL");
-});
-
-/*
-con.execute("SELECT * FROM users", function (err, result) {
-    if(err) throw err;
-    console.log(result[0].user_id);
-});
-*/
+console.log("Successfully Connected to MySQL");
 
 //Required Intents
 const client = new Client({
@@ -59,9 +53,6 @@ client.on("ready", (x) => {
         option.setName("number_of_teams")
             .setDescription("Number of teams to split into (Default is 2)")
     )
-    //.addUserOption(option =>
-    //    option.setName("exclude")
-    //        .setDescription("Select users to not include in matchmaking"))
     ;
     client.application.commands.create(matchvc);
 
@@ -114,6 +105,7 @@ client.on("interactionCreate", async (interaction) => {
     const {commandName, options} = interaction;
     if(commandName === 'ping')
     {
+        console.log("ping ran by " + interaction.user.tag);
         interaction.reply("pong!");
     }
     
@@ -139,9 +131,7 @@ client.on("interactionCreate", async (interaction) => {
 
     if(commandName === 'leaderboard')
     {
-        let data = await leaderboard(client, interaction, con);
-        console.log(data);
-        //interaction.reply("Test");
+        leaderboard(client, interaction, con);
 
     }
     if(commandName === 'resetstats')
@@ -156,3 +146,14 @@ client.on("interactionCreate", async (interaction) => {
         }
     }
 })
+
+//MySQL KeepAlive
+setInterval(() => {
+    con.query('SELECT 1', (error) => {
+      if (error) {
+        console.error('Error with keep-alive query:', error);
+      } else {
+        console.log("Running MySQL KeepAlive");
+      }
+    });
+  }, 1000 * 60 * 60);

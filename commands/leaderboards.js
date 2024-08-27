@@ -1,10 +1,10 @@
 import { EmbedBuilder } from "discord.js";
 
 export async function leaderboard (client, interaction, con) {
-    console.log("Given Server ID: "+ interaction.guild.id);
+    console.log("Leaderboard Command Ran\nGiven Server ID: "+ interaction.guild.id);
     let x;
-    let sqlcmd2 = `SELECT * FROM user_stats WHERE server_id=${interaction.guild.id} ORDER BY wins ASC`;
-    const users = con.execute(sqlcmd2, function (err, result2) {
+    let sqlcmd2 = `SELECT * FROM user_stats WHERE server_id=${interaction.guild.id} ORDER BY wins DESC`;
+    con.execute(sqlcmd2, function (err, result2) {
         if(err) throw err;
         if(result2.length > 0)
         {
@@ -19,9 +19,10 @@ export async function leaderboard (client, interaction, con) {
                 {name: 'Best W/L Ratio:', value: bestKDLeaderboard}
             );
             interaction.reply({ embeds: [outembed] });
-            //interaction.reply("" + result2[0].user_id + " " + result2[0].wins + " "  +result2[0].losses);
+            return;
         } else {
             interaction.reply("This server has no match stats");
+            return;
         }
         
         

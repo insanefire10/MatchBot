@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits, PermissionFlagsBits, ChannelType, userMention, GuildMember, WebhookClient, EmbedBuilder, SlashCommandBuilder, VoiceChannel} from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 import { Match } from '../classes/Match.js';
 
 export function matchVC(interaction, activeMatches, con){
