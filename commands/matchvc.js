@@ -62,7 +62,7 @@ export function matchVC(interaction, activeMatches, con){
     .setTitle("Teams List")
     .setFooter({ text: "Match ID: "+ currMatch.matchID })
     .setThumbnail('https://i.imgur.com/bc9zq15.png')
-    .setAuthor({ name: interaction.user.tag, iconURL: interaction.user.displayAvatarURL()});
+    .setAuthor({ name: (interaction.user.tag + `'s Match`), iconURL: interaction.user.displayAvatarURL()});
     for(let x = 0; x < outArray.length; x++){
         outEmbed.addFields({name: `Team ${x+1}`, value: teamMembers(outArray[x])});
     }     

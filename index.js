@@ -5,13 +5,15 @@ const sql_user = process.env.MYSQL_USER;
 const sql_pass = process.env.MYSQL_PASS;
 const sql_ip = process.env.MYSQL_IP;
 import mysql from 'mysql2'
+import { Match } from './classes/Match.js';
 import { matchVC } from './commands/matchvc.js';
 import { leaderboard } from './commands/leaderboards.js';
-import { Match } from './classes/Match.js';
 import { deleteStats } from './commands/resetstats.js';
+import { endMatch } from './commands/endmatch.js';
+import { configure } from './commands/configure.js';
 
 import { Client, GatewayIntentBits, PermissionFlagsBits, ChannelType, userMention, GuildMember, WebhookClient, EmbedBuilder, SlashCommandBuilder, VoiceChannel} from 'discord.js';
-import { endMatch } from './commands/endmatch.js';
+
 
 //MySQL Setup
 const con = await mysql.createPool({
@@ -84,8 +86,26 @@ client.on("ready", (x) => {
 
     const resetStats = new SlashCommandBuilder()
     .setName('resetstats')
-    .setDescription('Deletes all match stats (Admins only, Cannot be undone!)');
+    .setDescription('Deletes all match stats (Admins only, Cannot be undone!)')
+    .addUserOption(option => 
+        option.setName('user')
+        .setDescription('Delete Stats for only 1 user')
+    );
     client.application.commands.create(resetStats);
+
+    const guildConfigure = new SlashCommandBuilder()
+    .setName('configure')
+    .setDescription('Configure MatchBot for this server')
+    .addStringOption(option => 
+        option.setName('config')
+        .setDescription('Choose an option')
+        .setRequired(true)
+        .addChoices(
+            { name: 'Configure Team VCs', value:'confvc'},
+            { name: 'Alter Stats', value: 'alterstats'}
+        )
+    );
+    client.application.commands.create(guildConfigure);
 
     console.log("Slash Commands Successfully Registered");
 
@@ -139,11 +159,14 @@ client.on("interactionCreate", async (interaction) => {
         const isAdmin = interaction.member.permissions.has(PermissionFlagsBits.Administrator);
         if(isAdmin){
             deleteStats(interaction, con);
-            interaction.reply("All stats for this server have been deleted!");
         }
         else{
             interaction.reply("You do not have permission to do this!");
         }
+    }
+    if(commandName === 'configure')
+    {
+        configure(interaction, con);
     }
 })
 

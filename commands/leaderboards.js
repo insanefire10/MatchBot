@@ -42,7 +42,7 @@ function mostWinsCalc (arr) {
             outText += "🥉";
         }
         else{
-            outText += `:number_${i+1}:`;
+            outText += `${emoji_dict[i]}`;
         }
         outText += `<@${arr[i].user_id}>` + " " + `**${arr[i].wins}**\n`;
     }
@@ -67,10 +67,12 @@ function bestKD (arr) {
             outText += "🥉";
         }
         else{
-            outText += `:number_${i+1}:`;
+            outText += `${emoji_dict[i]}`;
         }
         outText += `<@${arr[i].user_id}>` + " " + `**${(arr[i].wins/arr[i].losses).toFixed(3)}**  (${arr[i].wins} / ${arr[i].losses})\n`;
     }
     return outText;
     
 }
+
+const emoji_dict = [`:one:`,`:two:`,`:three:`,`:four:`,`:five:`,`:six:`,`:seven:`,`:eight:`,`:nine:`,`:ten:`];
