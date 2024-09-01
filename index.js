@@ -51,10 +51,20 @@ client.on("ready", (x) => {
     const matchvc = new SlashCommandBuilder()
     .setName('matchvc')
     .setDescription('Makes teams based on everyone currently in the VC')
+    .addStringOption(option =>
+        option.setName('mode')
+        .setDescription('Casual (no leaderboard) or Competitive (with leaderboard and points)')
+        .setRequired(true)
+        .addChoices(
+            { name: 'Casual', value: 'casual'},
+            { name: 'Competitive', value: 'competitive' }
+        )
+    )
     .addIntegerOption(option =>
         option.setName("number_of_teams")
-            .setDescription("Number of teams to split into (Default is 2)")
+            .setDescription("Number of teams to split into (Default is 2, cannot be used for competitive mode)")
     )
+    
     ;
     client.application.commands.create(matchvc);
 
@@ -71,7 +81,7 @@ client.on("ready", (x) => {
 
     const endmatch = new SlashCommandBuilder()
     .setName('endmatch')
-    .setDescription('End the match')
+    .setDescription('End a competitive match and record the result')
     .addStringOption(option =>
         option.setName('end_result')
         .setDescription('Select which team won')
@@ -139,6 +149,9 @@ client.on("interactionCreate", async (interaction) => {
             for(let x = 0; x < newGame.matchArray.length; x++){
                 console.log(newGame.matchArray[x]);
             }
+        }
+        else if(newGame instanceof String){
+            console.log("User created casual match");
         }
         else{
             console.log("User Entered Invalid Args");
