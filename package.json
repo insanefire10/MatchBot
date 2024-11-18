@@ -5,7 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "author": "Adit Rajkumar",
   "license": "ISC",
@@ -13,6 +14,7 @@
     "discord": "^0.8.2",
     "dotenv": "^16.4.5",
     "env": "^0.0.2",
+    "express": "^4.21.0",
     "mysql2": "^3.11.0"
   }
 }

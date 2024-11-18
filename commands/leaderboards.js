@@ -1,4 +1,5 @@
 import { EmbedBuilder } from "discord.js";
+import e from "express";
 
 export async function leaderboard (client, interaction, con) {
     console.log("Leaderboard Command Ran\nGiven Server ID: "+ interaction.guild.id);
@@ -31,7 +32,7 @@ export async function leaderboard (client, interaction, con) {
 
 function mostWinsCalc (arr) {
     let outText = "";
-    for(let i = 0; i < arr.length || i === 10; i++){
+    for(let i = 0; i < arr.length || i < 10; i++){
         if(i === 0){
             outText += "🥇";
         }
@@ -51,12 +52,23 @@ function mostWinsCalc (arr) {
 
 function bestKD (arr) {
     arr.sort((a,b) => {
-        const rA = a.losses === 0 ? a.wins : a.wins / a.losses;
-        const rB = b.losses === 0 ? b.wins : b.wins / a.losses;
-        return rB - rA;
+        let akd = 0.0;
+        let bkd = 0.0;
+        if(a.losses == 0){
+            akd = a.wins;
+        }
+        else akd = a.wins/a.losses;
+        if(b.losses == 0){
+            bkd = b.wins;
+        }
+        else bkd = b.wins/b.losses;
+        if(akd === bkd){
+            return 0;
+        }
+        else return akd < bkd ? 1 : -1;
     });
     let outText = "";
-    for(let i = 0; i < arr.length || i === 10; i++){
+    for(let i = 0; i < arr.length || i < 10; i++){
         if(i === 0){
             outText += "🥇";
         }
@@ -69,10 +81,10 @@ function bestKD (arr) {
         else{
             outText += `${emoji_dict[i]}`;
         }
-        outText += `<@${arr[i].user_id}>` + " " + `**${(arr[i].wins/arr[i].losses).toFixed(3)}**  (${arr[i].wins} / ${arr[i].losses})\n`;
+        outText += `<@${arr[i].user_id}>` + " " + `**${(arr[i].losses == 0 ? arr[i].wins : arr[i].wins/arr[i].losses).toFixed(3)}**  (${arr[i].wins} / ${arr[i].losses})\n`;
     }
     return outText;
     
 }
 
-const emoji_dict = [`:one:`,`:two:`,`:three:`,`:four:`,`:five:`,`:six:`,`:seven:`,`:eight:`,`:nine:`,`:ten:`];
+const emoji_dict = [`:one:`,`:two:`,`:three:`,`:four:`,`:five:`,`:six:`,`:seven:`,`:eight:`,`:nine:`,`:keycap_ten:`];

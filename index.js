@@ -11,9 +11,11 @@ import { leaderboard } from './commands/leaderboards.js';
 import { deleteStats } from './commands/resetstats.js';
 import { endMatch } from './commands/endmatch.js';
 import { configure } from './commands/configure.js';
+import { api } from './api/api_main.js';
 
 import { Client, GatewayIntentBits, PermissionFlagsBits, ChannelType, userMention, GuildMember, WebhookClient, EmbedBuilder, SlashCommandBuilder, VoiceChannel} from 'discord.js';
 
+const startTime = new Date();
 
 //MySQL Setup
 const con = await mysql.createPool({
@@ -43,6 +45,7 @@ client.login(myToken);
 
 let activeMatches = [];
 
+api(con);
 
 client.on("ready", (x) => {
     console.log("Currently Online!");
@@ -117,6 +120,11 @@ client.on("ready", (x) => {
     );
     client.application.commands.create(guildConfigure);
 
+    const uptime = new SlashCommandBuilder()
+    .setName('uptime')
+    .setDescription('Check uptime of bot (for debugging)');
+    client.application.commands.create(uptime);
+
     console.log("Slash Commands Successfully Registered");
 
 })
@@ -180,6 +188,25 @@ client.on("interactionCreate", async (interaction) => {
     if(commandName === 'configure')
     {
         configure(interaction, con);
+    }
+    if(commandName === 'uptime')
+    {
+        const currentTime = new Date();
+        let elapsed = (currentTime - startTime) / 1000;
+        const days = Math.floor(elapsed / 86400);
+        if(days > 1){
+            elapsed = elapsed - (days*86400);
+        }
+        const hours = Math.floor(elapsed / 3600);
+        if(hours > 1){
+            elapsed = elapsed - (hours*3600);
+        }
+        const mins = Math.floor(elapsed / 60);
+        if(mins > 1){
+            elapsed = elapsed - (mins*60);
+        }
+        elapsed = Math.floor(elapsed);
+        interaction.reply(`${days} Days, ${hours} Hours, ${mins} Minutes, ${elapsed} Seconds`);
     }
 })
 

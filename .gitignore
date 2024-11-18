@@ -1,3 +1,5 @@
 node_modules/
 .env
 installlink.txt
+site
+api
